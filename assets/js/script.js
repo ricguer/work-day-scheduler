@@ -20,13 +20,60 @@ $(function () {
     }
   });
 
-  //
   // TODO: #2 Add code to apply the past, present, or future class to each time
   // block by comparing the id to the current hour. HINTS: How can the id
   // attribute of each time-block be used to conditionally add or remove the
   // past, present, and future classes? How can Day.js be used to get the
   // current hour in 24-hour time?
-  //
+
+  const WORK_HOURS_PER_DAY =  9;                                /* Work days are typically 9 hours (including lunch)    */
+  const WORK_HOUR_OFFSET   =  9;                                /* Work days typically start at 9am                     */
+
+                                                                /* ============= GENERATE TIME BLOCK DIVS ============= */
+  for (let hour = 0; hour < WORK_HOURS_PER_DAY; hour++) 
+  {
+    let timeBlockContainer  =  $(".container-lg.px-5");
+    let timeBlockElement    =  $("<div>");
+    let timeBlockID         =    "hour-" + (hour + WORK_HOUR_OFFSET);
+    let timeBlockClass      =    "row time-block ";
+
+                                                                /* Create time block element hour label                 */
+    let timeBlockHourLabelElement = $("<div>", {
+      class: "col-2 col-md-1 hour text-center py-3",
+      text: dayjs().hour((hour + WORK_HOUR_OFFSET)).format("h A")
+    });
+
+                                                                /* Create time block text area element                  */
+    let timeBlockTextAreaElement = $("<textarea>", {
+      class: "col-8 col-md-10 description",
+      rows: "3"
+    });
+
+                                                                /* Create time block save button element                */
+    let timeBlockSaveButtonElement = $("<button>", {
+      class: "btn saveBtn col-2 col-md-1",
+      "aria-label": "save"
+    });
+
+                                                                /* Create time block save button icon element           */
+    let saveButtonIcon = $("<i>", {
+      class: "fas fa-save",
+      "aria-hidden": "true"
+    });
+
+    timeBlockSaveButtonElement.append(saveButtonIcon);          /* Append save icon to save button element              */
+
+                                                                /* Determine class of time block                        */
+    timeBlockClass += "past";
+
+    timeBlockElement.attr("id", timeBlockID);                   /* Set time block div ID                                */
+    timeBlockElement.attr("class", timeBlockClass);             /* Set time block div class                             */
+    timeBlockElement.append(timeBlockHourLabelElement);         /* Append time block hour label to time block           */
+    timeBlockElement.append(timeBlockTextAreaElement);          /* Append time block text area to time block            */
+    timeBlockElement.append(timeBlockSaveButtonElement);        /* Append time block save button to time block          */
+    timeBlockElement.appendTo(timeBlockContainer);              /* Append time block div to container                   */
+  }
+
   // TODO: #3 Add code to get any user input that was saved in localStorage and set
   // the values of the corresponding textarea elements. HINT: How can the id
   // attribute of each time-block be used to do this?

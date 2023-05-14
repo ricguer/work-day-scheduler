@@ -1,35 +1,17 @@
 // Wrap all code that interacts with the DOM in a call to jQuery to ensure that
 // the code isn't run until the browser has finished rendering all the elements
 // in the html.
-$(function () {
-  // TODO: #1 Add a listener for click events on the save button. This code should
-  // use the id in the containing time-block as a key to save the user input in
-  // local storage. HINT: What does `this` reference in the click listener
-  // function? How can DOM traversal be used to get the "hour-x" id of the
-  // time-block containing the button that was clicked? How might the id be
-  // useful when saving the description in local storage?
-
-  $(".saveBtn").on("click", function (event) {
-    let saveButton = $(event.target);
-
-    if (saveButton.is("button"))
-    {
-      let parentElement = saveButton.parent();
-      let textArea = parentElement.find(".description");
-      localStorage.setItem(parentElement.attr("id"), textArea.val());
-    }
-  });
-
-  // TODO: #2 Add code to apply the past, present, or future class to each time
-  // block by comparing the id to the current hour. HINTS: How can the id
-  // attribute of each time-block be used to conditionally add or remove the
-  // past, present, and future classes? How can Day.js be used to get the
-  // current hour in 24-hour time?
-
+$(function () 
+{
+                                                                /* ==================== CONSTANTS ===================== */
   const WORK_HOURS_PER_DAY =  9;                                /* Work days are typically 9 hours (including lunch)    */
   const WORK_HOUR_OFFSET   =  9;                                /* Work days typically start at 9am                     */
-  const DAYJS = dayjs();                                        /* Day.js Object                                        */
-  const CURRENT_HOUR = DAYJS.hour();                            /* Current hour                                         */
+  const DAYJS              =  dayjs();                          /* Day.js Object                                        */
+  const CURRENT_HOUR       =  DAYJS.hour();                     /* Current hour                                         */
+
+
+  $("#currentDay").text(dayjs().format("dddd, MMM DD, YYYY"));  /* Display weekday and date in header of the page       */
+
 
                                                                 /* ============= GENERATE TIME BLOCK DIVS ============= */
   for (let hour = 0; hour < WORK_HOURS_PER_DAY; hour++) 
@@ -50,7 +32,8 @@ $(function () {
                                                                 /* ------------ BUILD TIME BLOCK TEXT AREA ------------ */
     let timeBlockTextAreaElement = $("<textarea>", {
       class: "col-8 col-md-10 description",
-      rows: "3"
+      rows: "3",
+      text: localStorage.getItem(timeBlockID)
     });
 
 
@@ -93,10 +76,29 @@ $(function () {
     timeBlockElement.appendTo(timeBlockContainer);              /* Append time block div to container                   */
   }
 
-  // TODO: #3 Add code to get any user input that was saved in localStorage and set
-  // the values of the corresponding textarea elements. HINT: How can the id
-  // attribute of each time-block be used to do this?
-  //
-  // TODO: #4 Add code to display the current date in the header of the page.
-  $("#currentDay").text(dayjs().format("dddd, MMM DD, YYYY"));
+                                                                /* ================= EVENT LISTENERS ================== */
+  $(".saveBtn").on("click", saveScheduledDay);                  /* Attach click event listener to "Save" button & icon  */
 });
+
+
+/**
+ * Save text written in text area of time block to local 
+ * storage.
+ * 
+ * @param {*} event 
+ */
+function saveScheduledDay(event) {
+  let saveButton = $(event.target);                             /* Get reference to event target                        */
+  let parentElement = saveButton.parent();                      /* Get parent element of event target                   */
+
+  while (parentElement.is(".time-block") == false)              /* Ensure parent element is the time-block              */
+  {
+    parentElement = parentElement.parent();                     /* Continue moving up DOM tree until time-block found   */
+  }
+
+  let textArea = parentElement.find(".description");            /* Save reference to text are of time-block             */
+
+                                                                /* Send text area value to localStorage using...        */
+                                                                /* ... time-block id as key.                            */
+  localStorage.setItem(parentElement.attr("id"), textArea.val());
+}
